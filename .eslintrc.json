@@ -1,0 +1,17 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "semi": "off",
+    "linebreak-style": "off",
+    "no-param-reassign": "off",
+    "no-plusplus": "off",
+    "no-undef": "off",
+    "no-eval": "off",
+    "no-alert": "off",
+    "no-use-before-define": "off",
+    "no-trailing-spaces": "off",
+    "no-continue": "off",
+    "no-shadow": "off",
+    "func-names": "off"
+  }
+}

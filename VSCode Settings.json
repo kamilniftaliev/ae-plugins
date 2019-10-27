@@ -1,0 +1,80 @@
+{
+    "vscode_custom_css.imports": ["file:///Users/kamil/Desktop/ae/no-tabs.css"],
+    "vscode_custom_css.policy": true,
+    
+    "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
+    "editor.minimap.enabled": false,
+    "window.zoomLevel": 2,
+    "editor.tabSize": 2,
+    // "editor.fontFamily": "Source Code Variable",
+    "scm.diffDecorations": "none",
+    "workbench.colorCustomizations": {
+        "tab.activeBackground": "#282c34",
+        "activityBar.background": "#282c34",
+        "sideBar.background": "#282c34",
+        "editorCursor.foreground": "#282c34"
+        // "editorError.foreground": "#282c34",
+        // "editorWarning.foreground": "#282c34",
+        // "editorInfo.foreground": "#282c34"
+    },
+    "html.validate": false,
+    "typescript.validate.enable": false,
+    "javascript.validate.enable": false,
+    "css.validate": false,
+    "editor.lightbulb.enabled": false,
+    "editor.renderIndentGuides": false,
+    "workbench.editor.showTabs": false,
+    "workbench.startupEditor": "newUntitledFile",
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "window.menuBarVisibility": "default",
+    "breadcrumbs.enabled": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "editor.selectionHighlight": false,
+    "editor.matchBrackets": false,
+    "editor.highlightActiveIndentGuide": false,
+    "editor.occurrencesHighlight": false,
+    "editor.cursorBlinking": "solid",
+    "editor.renderLineHighlight": "none",
+    "editor.cursorStyle": "line-thin",
+    "editor.hideCursorInOverviewRuler": true,
+    "editor.cursorWidth": 1,
+
+    // Margins (not all here)
+    "editor.glyphMargin": false,
+    "editor.folding": false,
+
+    // Suggestions
+    "eslint.enable": false,
+    "editor.snippetSuggestions": "none",
+    "editor.tabCompletion": "off",
+    "editor.suggestOnTriggerCharacters": false,
+    "editor.wordBasedSuggestions": false,
+    "html.suggest.html5": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.parameterHints.enabled": false,
+    "editor.parameterHints": false,
+    "editor.hover.enabled": false,
+    "editor.quickSuggestions": {
+        "other": false,
+        "comments": false,
+        "strings": false
+    },
+
+    "editor.colorDecorators": false,
+    "workbench.statusBar.visible": false,
+    "workbench.activityBar.visible": false,
+    "editor.renderWhitespace": "none",
+    "editor.renderControlCharacters": false,
+
+    "git.decorations.enabled": false,
+    "git.showInlineOpenFileAction": false,
+    "editor.scrollbar.verticalScrollbarSize": 0,
+    "editor.scrollbar.horizontalScrollbarSize": 0,
+    "workbench.colorTheme": "One Dark Pro",
+    "sync.gist": "f69094188f28219cf791832d5c8ef85b",
+    "html.autoClosingTags": false
+}

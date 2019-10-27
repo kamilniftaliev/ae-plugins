@@ -1,0 +1,12 @@
+.title.show-file-icons {
+  display: none !important;
+}
+
+.margin-view-overlays {
+  width: 45px;
+  padding-left: 4px;
+}
+
+.decorationsOverviewRuler {
+  display: none !important;
+}

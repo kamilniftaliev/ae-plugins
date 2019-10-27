@@ -1,0 +1,12 @@
+{
+  "presets": [
+    [ "extendscript"],
+    [ "@babel/preset-env", { "debug": true } ],
+  ],
+  "plugins": [
+    "@babel/plugin-transform-destructuring",
+    "transform-es3-member-expression-literals",
+    "transform-es3-property-literals",
+    "transform-es5-property-mutators"
+  ]
+}
