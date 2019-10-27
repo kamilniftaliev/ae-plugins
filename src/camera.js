@@ -67,21 +67,14 @@ function buildUI() {
   ui.fromCursorPosition = panel.col2.add('checkbox', undefined, config.fromCursorPosition)
 
   panel.col3.add('statictext', undefined, 'Add New Marker').justify = 'center'
-  
-  const mainCompLayers = getComp('Main')
-  const mainCompLayerNames = []
-  if (mainCompLayers) {
-    for (let li = 1; li <= mainCompLayers.numLayers; li++) {
-      const { name, hasVideo } = mainCompLayers.layers[li]
-      if (hasVideo) mainCompLayerNames.push(name)
-    }
-  }
 
   ui.newMarkerLayerGroup = panel.col3.add('group')
-  ui.newMarkerLayer = ui.newMarkerLayerGroup.add('dropdownlist', undefined, mainCompLayerNames)
+  ui.newMarkerLayer = ui.newMarkerLayerGroup.add('dropdownlist', undefined)
+  ui.newMarkerLayerGroup.addEventListener('mouseover', getMainCompLayers)
+  const mainCompLayerNames = getMainCompLayers()
   ui.newMarkerLayer.helpTip = 'Layer to move to'
   ui.newMarkerLayer.selection = mainCompLayerNames[2]
-  const eyeIcon = File(`./icons/eye.png`)
+  const eyeIcon = File('./icons/eye.png')
   ui.focusBtn = ui.newMarkerLayerGroup.add('iconbutton', undefined, eyeIcon, { style: 'toolbutton', toggle: true })
   ui.focusBtn.helpTip = 'Focus'
 
@@ -131,7 +124,7 @@ function buildUI() {
 
   ui.setCameraPoints = panel.leftCol.add('button', undefined, 'Set camera points')
   ui.setCameraPoints.onClick = function apply() {
-    // try {
+    try {
       times.transition = parseFloat(ui.transition.text)
       times.zoom = parseFloat(ui.zoom.text)
       times.wiggle = parseFloat(ui.wiggle.text)
@@ -141,14 +134,31 @@ function buildUI() {
       
       win.progress = ProgressBar({ title: 'Setting camera points' })
       setCameraPoints()
-    // } catch (e) {
-    //   log(e)
-    // }
+    } catch (e) {
+      log(e)
+    }
   }
 
   panel.hide()
   
   return panel
+}
+
+function getMainCompLayers() {
+  const mainCompLayers = getComp('Main')
+  const mainCompLayerNames = []
+  if (mainCompLayers) {
+    for (let li = 1; li <= mainCompLayers.numLayers; li++) {
+      const { name, hasVideo } = mainCompLayers.layers[li]
+      if (hasVideo) mainCompLayerNames.push(name)
+    }
+  }
+
+  const selectedValue = ui.newMarkerLayer.selection
+  ui.newMarkerLayer.removeAll()
+  mainCompLayerNames.forEach(l => ui.newMarkerLayer.add('item', l))
+  ui.newMarkerLayer.selection = selectedValue
+  return mainCompLayerNames
 }
 
 function addRoving(time) {
@@ -358,7 +368,7 @@ function getMarker(index) {
 }
 
 function setTransitionBetweenComps(firstMarkerIndex) {
-  const { comp, compPosition, name } = getMarker(firstMarkerIndex)
+  const { comp, compPosition, name, time } = getMarker(firstMarkerIndex)
   const nextMarker = getNextMarker(firstMarkerIndex)
   if (!nextMarker) return
 
@@ -368,13 +378,19 @@ function setTransitionBetweenComps(firstMarkerIndex) {
   const transitionStartTime = nextMarker.time - times.transition
   const betweenComps = compPosition
   betweenComps[0] = (compPosition[0] + nextMarker.compPosition[0]) / 2
-  betweenComps[1] = (compPosition[1] + nextMarker.compPosition[1]) / 2
+  betweenComps[1] = (compPosition[1] + nextMarker.compPosition[1]) / 2  
 
-  cameraOnComp({
-    comp,
-    time: transitionStartTime,
-    easeOut: true,
-  })
+  const cameraPosition = camera.property('Position')
+  const nearestKey = cameraPosition.nearestKeyIndex(transitionStartTime)
+  const lastPositionTime = cameraPosition.keyTime(nearestKey)
+
+  if (transitionStartTime - lastPositionTime > times.transition / 3) {
+    cameraOnComp({
+      comp,
+      time: transitionStartTime,
+      easeOut: true,
+    })
+  }
 
   const middleTime = transitionStartTime + (times.transition / 2)
 
@@ -393,7 +409,7 @@ function getNextMarker(i) {
 }
 
 function wiggle(i) {
-  const { name, time, comp } = getMarker(i)
+  const { time, comp } = getMarker(i)
   
   const nextMarker = getNextMarker(i)
   const nextMarkerTime = nextMarker ? nextMarker.time : comps.main.duration
@@ -431,26 +447,27 @@ function getFocusPosition({
 }
 
 function focusToComp(index) {
-  const { cursorPosition } = config
   const curMarker = getMarker(index)
 
   const nextMarker = getNextMarker(index)
   if (!nextMarker || !curMarker) return
+
   const {
     time,
-    duration,
     name,
-    comment,
     comp: markerComp,
     positionZ,
     compPosition,
   } = curMarker
 
   const startTime = time
-  const endTime = nextMarker.time
+  const nextKeyTime = nextMarker.time
   const comp = getComp(name)
   
-  if (!comp) return log(`Didn't find composition named "${name}"`)
+  if (!comp) {
+    log(`Didn't find composition named "${name}"`)
+    return
+  }
 
   const areaStart = startTime - times.zoom
   saveCameraPosition({
@@ -486,7 +503,7 @@ function focusToComp(index) {
   for (let i = 1; i <= focusPoint.numKeys; i++) {
     const keyTime = parseInt((focusPoint.keyTime(i) + compLayerStartTime) * frameRate, 10) / frameRate
     
-    if (keyTime < startTime || keyTime > endTime) continue
+    if (keyTime < startTime || keyTime > nextKeyTime) continue
     
     args.time = keyTime
     args.pointOfInterest = getFocusPosition(args)
@@ -505,29 +522,30 @@ function focusToComp(index) {
     addFocusMove(args.time)
 
     // If it's last key then zoom out
-    if (
-      (
-        (i < focusPoint.numKeys && focusPoint.keyTime(i + 1) > endTime)
-        || i === focusPoint.numKeys
-      )
-      && endTime > keyTime + times.zoom * 2
-    ) {
-      args.easeIn = true
-      args.easeOut = true
-      args.time = keyTime + times.zoom
-      cameraOnComp(args)
+    // if (
+    //   (
+    //     (i < focusPoint.numKeys && focusPoint.keyTime(i + 1) > nextKeyTime)
+    //     || i === focusPoint.numKeys
+    //   )
+    //   && nextKeyTime > keyTime + times.zoom * 2
+    // ) {
+    //   args.easeIn = true
+    //   args.easeOut = true
+    //   args.time = keyTime + times.zoom
+      // log(args)
+      // cameraOnComp(args)
 
-      const clearingProps = {
-        layer: camera,
-      }
-      clearLayerProp({ ...clearingProps })
-      clearLayerProp({ ...clearingProps, propName: 'Point Of Interest' })
+      // const clearingProps = {
+      //   layer: camera,
+      // }
+      // clearLayerProp({ ...clearingProps })
+      // clearLayerProp({ ...clearingProps, propName: 'Point Of Interest' })
 
-      const marker = cameraMarkers.keyValue(index)
-      marker.comment = `{ "comp": "${name}", "generated": 1 }`
-      cameraMarkers.setValueAtTime(args.time, marker)
+      // const marker = cameraMarkers.keyValue(index)
+      // marker.comment = `{ "comp": "${name}", "generated": 1 }`
+      // cameraMarkers.setValueAtTime(args.time, marker)
       // wiggle(cameraMarkers.nearestKeyIndex(args.time))
-    }
+    // }
   }
 
   const focusExpression = 'var b = Math.abs(transform.position[2] / 3); b > 300 ? 0 : b'
@@ -592,9 +610,10 @@ function resetVariables() {
 
 function resetCamera() {
   camera = comps.main.layer('Camera')
-  camera.selected = true
-  camera.applyPreset(File(`${path}/presets/camera/camera-options.ffx`))
+  // camera.selected = true
+  // camera.applyPreset(File(`${path}/presets/camera/camera-options.ffx`))
   camera.selected = false
+  
 
   clearLayerProp({ layer: camera })
   clearLayerProp({ layer: camera, propName: 'Point Of Interest' })
@@ -607,8 +626,6 @@ function resetCamera() {
 
     if (json.generated) cameraMarkers.removeKey(i)
   }
-
-  // log(cameraMarkers.keyValue(3))
 }
 
 function setCameraPoints() {
@@ -616,7 +633,7 @@ function setCameraPoints() {
   if (!comps.main) return
 
   app.beginUndoGroup('Camera')
-
+  
   resetCamera()
 
   win.progress.up(10)

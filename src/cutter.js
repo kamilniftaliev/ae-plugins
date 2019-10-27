@@ -38,17 +38,9 @@ function buildUI() {
   panel.footage = panel.col1.add('group')
   panel.footage.add('staticText', undefined, 'Footage:')
 
-  const itemNames = []
-  const { items } = app.project
-  
-  for (let i = 1; i <= items.length; i++) {
-    const { typeName, name, duration, hasVideo } = items[i]
-    if (typeName === 'Footage' && hasVideo && duration > 0) {
-      itemNames.push(name)
-    }
-  }
-  
-  ui.footageName = panel.footage.add('dropdownlist', undefined, itemNames)
+  ui.footageName = panel.footage.add('dropdownlist', undefined)
+  const itemNames = getItemNames()  
+  panel.footage.addEventListener('mouseover', getItemNames)
   ui.footageName.selection = itemNames[0]
 
   panel.recalculate = panel.col1.add('group')
@@ -150,6 +142,28 @@ function buildUI() {
   panel.hide()
 
   return panel
+}
+
+function getItemNames() {
+  const { items } = app.project
+  const names = []
+  
+  for (let i = 1; i <= items.length; i++) {
+    const { typeName, name, duration, hasVideo } = items[i]
+    if (typeName === 'Footage' && hasVideo && duration > 0) {
+      names.push(name)
+    }
+  }
+
+  const selectedItemText = ui.footageName.selection?.text
+  // log(selectedItemText)
+
+  // ui.footageName.removeAll()
+  names.forEach(n => ui.footageName.add('item', n))
+  if (selectedItemText) {
+    ui.footageName.find(selectedItemText).selected = true
+  }
+  return names
 }
 
 function makeBackup(options = {}) {
@@ -407,6 +421,7 @@ function convertExpressionToKeyframes() {
   const { Checkbox: updatedCheckbox } = footageLayer.effect('Updated')
   const saveEvery = updates.duration > 10 ? 1 : 5
 
+
   if (lastCheckedTime && lastCheckedTime >= end - 2) return
 
   updatedCheckbox.selected = true
@@ -460,14 +475,14 @@ function convertExpressionToKeyframes() {
 
   footageLayer.inPoint = 0
   win.progress.up(100)
-  win.progress.description('Finished !')
+  // win.progress.description('Finished !')
   if (backupFile) backupFile.close()
 }
 
 function createCutterComp() {
   cutterComp = getComp('Cutter')
 
-  if (cutterComp) {
+  if (cutterComp && cutterComp.layer('footage')) {
     clearComp(cutterComp, ['footage'])
     footageLayer = cutterComp.layer('footage')
   } else {
@@ -483,8 +498,9 @@ function createCutterComp() {
     // }
   }
 
+  
   cutterComp.openInViewer()
-
+  
   if (recalculateFromBackup) loadBackup()
 
   if (recalculate) convertExpressionToKeyframes()

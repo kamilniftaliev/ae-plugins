@@ -6,8 +6,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   mode: 'development',
 
+  devtool: 'eval',
+
   entry: {
-    Plugins: path.resolve(__dirname, './src/index'),
+    Tutorial: path.resolve(__dirname, './src/index'),
     // Cutter: path.resolve(__dirname, './src/cutter'),
     // Camera: path.resolve(__dirname, './src/camera'),
     // Files: path.resolve(__dirname, './src/files'),

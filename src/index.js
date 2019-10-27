@@ -18,21 +18,26 @@ if (that instanceof Panel) {
   //   resizeable: true,
   // })
 }
+
+// Hide previous panels
+win.children.forEach(c => { c.visible = false })
+
 win.orientation = 'stack'
 win.alignChildren = 'top'
+let panels;
+
+function showPanel() {
+  const panel = panels[win.visiblePanel]
+  const x = (width - panel.preferredSize[0] - 30) / 2
+  panel.location = [x, 70]
+  panel.show()
+}
 
 try {
-  const panels = {
+  panels = {
     camera: cameraUI(),
     audio: audioUI(),
     cutter: cutterUI(),
-  }
-
-  function showPanel() {
-    const panel = panels[win.visiblePanel]
-    const x = (width - panel.preferredSize[0] - 30) / 2
-    panel.location = [x, 70]
-    panel.show()
   }
 
   try {
@@ -67,7 +72,7 @@ try {
 
   app.pluginsPanel = win
 
-  log(getComp('ui').layer('css').mask('Mask')('ADBE Mask Shape'))
-
   if (win instanceof Window) win.show()
-} catch (e) { log(e) }
+} catch (e) {
+  log(e)
+}

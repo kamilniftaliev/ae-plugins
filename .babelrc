@@ -1,9 +1,7 @@
 {
-  "presets": [
-    [ "extendscript"],
-    [ "@babel/preset-env", { "debug": true } ],
-  ],
+  "presets": [["extendscript"], ["@babel/preset-env", { "debug": true }]],
   "plugins": [
+    "@babel/plugin-proposal-optional-chaining",
     "@babel/plugin-transform-destructuring",
     "transform-es3-member-expression-literals",
     "transform-es3-property-literals",

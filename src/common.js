@@ -270,8 +270,8 @@ exports.ProgressBar = function ProgressBar({
 
     titleElement.text = `${title} - (${bar.value}%)`
 
-    if (bar.value > 99) {      
-      w.visible = false
+    // If it's finished close the progress window
+    if (bar.value > 99) {
       w.hide()
       w.close()
       win.progress.w.visible = false

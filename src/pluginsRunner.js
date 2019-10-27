@@ -14,5 +14,5 @@ if (pluginCommand) {
     app.executeCommand(pluginCommand)
   }
 } else if (app.project.items.length) {
-  alert('Copy "Tutorial Plugins" folder to After Effects "Script UI" folder')
+  alert('Copy "DIST" folder to After Effects "Script UI" folder')
 }
