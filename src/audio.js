@@ -16,7 +16,8 @@ const frameRate = 60
 const { path } = File($.fileName)
 
 function buildUI() {
-  const panel = win.add('panel', undefined, 'Audio', { borderStyle: 'black' })
+  const win = app.pluginsPanel
+  const panel = win.pluginsContainer.add('panel', undefined, 'Audio', { borderStyle: 'black' })
 
   panel.add('staticText', undefined, 'Audio volumes adjuster').justify = 'center'
 

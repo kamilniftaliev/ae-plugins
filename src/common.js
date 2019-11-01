@@ -146,7 +146,7 @@ exports.clearSelection = function clearSelection(comp) {
 function err(string) {
   log(string)
 }
-// app.onError = err
+app.onError = err
 
 exports.log = log
 
@@ -319,4 +319,15 @@ exports.ProgressBar = function ProgressBar({
 //   glow.property('Glow Intensity').setValue(50)
 //   glow.property('Glow Colors').setValue('A & B Colors')
 //   glow.property('Color B').setValue('#ffffff')
+// }
+
+// exports.getWindowSize = function() {
+//   const win = app.pluginsPanel
+//   const width = win.windowBounds[2] - win.windowBounds[0]
+//   const height = win.windowBounds[3] - win.windowBounds[1]
+
+//   return {
+//     width,
+//     height,
+//   }
 // }

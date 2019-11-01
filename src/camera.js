@@ -24,13 +24,18 @@ let rovingTimes
 const { path } = File($.fileName)
 const inputSize = [0, 0, 40, 22]
 const textSize = [0, 0, 100, 22]
+const icons = {
+  eye: File('./icons/eye.png'),
+}
 
 function buildUI() {
   resetVariables()
   
-  const panel = win.add('panel', undefined, 'Camera', { borderStyle: 'black' })
+  const win = app.pluginsPanel
+  const panel = win.pluginsContainer.add('panel', undefined, 'Camera', { borderStyle: 'black' })
 
   panel.orientation = 'row'
+  panel.alignChildren = 'fill';
   panel.leftCol = panel.add('group')
   panel.leftCol.orientation = 'column'
 
@@ -70,12 +75,11 @@ function buildUI() {
 
   ui.newMarkerLayerGroup = panel.col3.add('group')
   ui.newMarkerLayer = ui.newMarkerLayerGroup.add('dropdownlist', undefined)
+  getMainCompLayers()
   ui.newMarkerLayerGroup.addEventListener('mouseover', getMainCompLayers)
-  const mainCompLayerNames = getMainCompLayers()
   ui.newMarkerLayer.helpTip = 'Layer to move to'
-  ui.newMarkerLayer.selection = mainCompLayerNames[2]
-  const eyeIcon = File('./icons/eye.png')
-  ui.focusBtn = ui.newMarkerLayerGroup.add('iconbutton', undefined, eyeIcon, { style: 'toolbutton', toggle: true })
+
+  ui.focusBtn = ui.newMarkerLayerGroup.add('iconbutton', undefined, icons.eye, { style: 'toolbutton', toggle: true })
   ui.focusBtn.helpTip = 'Focus'
 
   const { focusedPositionZ, focusedAngle } = config
@@ -146,19 +150,28 @@ function buildUI() {
 
 function getMainCompLayers() {
   const mainCompLayers = getComp('Main')
-  const mainCompLayerNames = []
+  const names = []
+  if (!mainCompLayers) return [];
+
   if (mainCompLayers) {
     for (let li = 1; li <= mainCompLayers.numLayers; li++) {
       const { name, hasVideo } = mainCompLayers.layers[li]
-      if (hasVideo) mainCompLayerNames.push(name)
+      if (hasVideo) names.push(name)
     }
   }
 
-  const selectedValue = ui.newMarkerLayer.selection
-  ui.newMarkerLayer.removeAll()
-  mainCompLayerNames.forEach(l => ui.newMarkerLayer.add('item', l))
-  ui.newMarkerLayer.selection = selectedValue
-  return mainCompLayerNames
+  const selectedItemText = ui.newMarkerLayer.selection?.text
+
+  ui.newMarkerLayer.removeAll();
+
+  names.forEach(n => {
+    const item = ui.newMarkerLayer.add('item', n);
+    if (n === selectedItemText) item.selected = true;
+  });
+
+  if (!selectedItemText) ui.newMarkerLayer.items[0].selected = true;
+
+  return names;
 }
 
 function addRoving(time) {

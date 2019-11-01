@@ -1,10 +1,11 @@
 {
   "presets": [["extendscript"], ["@babel/preset-env", { "debug": true }]],
   "plugins": [
-    "@babel/plugin-proposal-optional-chaining",
-    "@babel/plugin-transform-destructuring",
     "transform-es3-member-expression-literals",
     "transform-es3-property-literals",
-    "transform-es5-property-mutators"
+    "transform-es5-property-mutators",
+    "@babel/plugin-transform-destructuring",
+    "@babel/plugin-proposal-optional-chaining",
+    "@babel/plugin-proposal-object-rest-spread"
   ]
 }
