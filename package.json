@@ -35,7 +35,7 @@
     "ncp": "^2.0.0",
     "parse-json": "^5.0.0",
     "run-applescript": "^3.2.0",
-    "shelljs": "^0.8.3",
+    "shelljs": "^0.8.5",
     "webpack": "^4.41.2",
     "webpack-shell-plugin": "^0.5.0",
     "wrapper-webpack-plugin": "^2.1.0"
